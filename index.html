@@ -1,40 +1,130 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Us</title>
-  <style>
-    body {
-      background: #fff0f5;
-      font-family: Arial;
-      text-align: center;
-      padding-top: 100px;
-    }
-    button {
-      padding: 15px 30px;
-      font-size: 18px;
-      background: #ff4d6d;
-      color: white;
-      border: none;
-      border-radius: 12px;
-    }
-  </style>
+<meta charset="UTF-8">
+<title>Our Journey</title>
+
+<style>
+  body {
+    margin: 0;
+    height: 100vh;
+    background: linear-gradient(135deg, #fff0f5, #ffe6ee);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-family: "Segoe UI", Arial, sans-serif;
+    color: #333;
+  }
+
+  .card {
+    background: white;
+    padding: 35px;
+    border-radius: 20px;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+    text-align: center;
+    max-width: 360px;
+    width: 90%;
+  }
+
+  h1 {
+    margin-bottom: 10px;
+  }
+
+  .heart {
+    font-size: 28px;
+    animation: beat 1.2s infinite;
+  }
+
+  @keyframes beat {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.2); }
+  }
+
+  .typing {
+    font-size: 18px;
+    font-weight: bold;
+    margin: 15px 0;
+    min-height: 24px;
+  }
+
+  .counter {
+    font-size: 14px;
+    color: #777;
+    margin-bottom: 20px;
+  }
+
+  button {
+    padding: 14px 28px;
+    font-size: 16px;
+    background: #ff4d6d;
+    color: white;
+    border: none;
+    border-radius: 30px;
+    cursor: pointer;
+    transition: 0.3s;
+  }
+
+  button:hover {
+    background: #e63b5f;
+  }
+
+  #msg {
+    margin-top: 20px;
+    font-size: 16px;
+    line-height: 1.6;
+  }
+</style>
 </head>
+
 <body>
 
-<h1>Our Journey ❤️</h1>
-<p>Started: December 2022</p>
-<p>Status: Still choosing each other</p>
+<div class="card">
+  <h1>Our Journey <span class="heart">❤️</span></h1>
 
-<button onclick="propose()">Next Step?</button>
+  <div class="typing" id="typing"></div>
 
-<p id="msg"></p>
+  <div class="counter" id="counter"></div>
+
+  <button onclick="propose()">Next Chapter</button>
+
+  <div id="msg"></div>
+</div>
 
 <script>
+/* Typing effect */
+const text = "Nubah, this is our story.";
+let i = 0;
+function typeText() {
+  if (i < text.length) {
+    document.getElementById("typing").innerHTML += text.charAt(i);
+    i++;
+    setTimeout(typeText, 80);
+  }
+}
+typeText();
+
+/* Counter since December 2022 */
+const startDate = new Date("2022-12-01");
+function updateCounter() {
+  const now = new Date();
+  const diff = now - startDate;
+
+  const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+  const months = Math.floor(days / 30);
+  const years = Math.floor(months / 12);
+
+  document.getElementById("counter").innerHTML =
+    `Together since December 2022 · ${years} years, ${months % 12} months, ${days % 30} days`;
+}
+updateCounter();
+
+/* Proposal message */
 function propose() {
   document.getElementById("msg").innerHTML =
     "Through every version of life,<br>" +
-    "I still choose you ❤️<br><br>" +
-    "<b>Will you stay with me forever?</b>";
+    "every high and low,<br>" +
+    "I still choose you, Nubah ❤️<br><br>" +
+    "<b>Will you stay with me, always?</b>";
 }
 </script>
 
