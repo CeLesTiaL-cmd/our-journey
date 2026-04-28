@@ -23,7 +23,7 @@ body{
   overflow:hidden;
 }
 
-/* PROGRESS BAR */
+/* PROGRESS */
 .progress{
   position:fixed;
   top:0;
@@ -32,7 +32,6 @@ body{
   background:var(--accent);
   width:0%;
   z-index:999;
-  transition:width 0.4s ease;
 }
 
 /* SECTION */
@@ -48,17 +47,10 @@ section{
 }
 
 /* HERO */
-.hero h1{
-  font-size:2.5rem;
-  color:var(--accent);
-}
+.hero h1{color:var(--accent);font-size:2.5rem;}
 .hero p{opacity:0.6;margin-top:10px;}
 
 /* SLIDES */
-.slide{
-  text-align:center;
-}
-
 .slide img{
   width:90%;
   max-width:380px;
@@ -67,11 +59,8 @@ section{
   animation:reveal 1.2s ease;
 }
 
-.caption h2{
-  color:var(--accent);
-  margin-top:15px;
-}
-.caption p{opacity:0.7;}
+.caption h2{color:var(--accent);margin-top:15px;}
+.caption p{opacity:0.7;min-height:24px;}
 
 /* FINAL */
 .final h1{
@@ -79,7 +68,13 @@ section{
   font-size:2.5rem;
 }
 
-/* MUSIC BUTTON */
+.love{
+  font-size:2rem;
+  color:var(--accent);
+  animation:lovePulse 1s infinite alternate;
+}
+
+/* MUSIC */
 .music{
   position:fixed;
   bottom:20px;
@@ -89,7 +84,51 @@ section{
   padding:10px 15px;
   border-radius:20px;
   cursor:pointer;
-  z-index:999;
+}
+
+/* ANIMATIONS */
+@keyframes reveal{
+  from{opacity:0;filter:blur(10px);transform:scale(0.9);}
+  to{opacity:1;filter:blur(0);transform:scale(1);}
+}
+
+@keyframes lovePulse{
+  from{transform:scale(1);}
+  to{transform:scale(1.2);}
+}
+
+/* ENTRY */
+.from-left{animation:fromLeft 1s;}
+.from-right{animation:fromRight 1s;}
+.from-bottom{animation:fromBottom 1s;}
+
+@keyframes fromLeft{from{opacity:0;transform:translateX(-80px);}to{opacity:1;}}
+@keyframes fromRight{from{opacity:0;transform:translateX(80px);}to{opacity:1;}}
+@keyframes fromBottom{from{opacity:0;transform:translateY(60px);}to{opacity:1;}}
+
+/* PETALS */
+.petal{
+  position:fixed;
+  width:10px;height:10px;
+  background:pink;
+  border-radius:50%;
+  top:-10px;
+  animation:fall linear forwards;
+}
+@keyframes fall{
+  to{transform:translateY(100vh) translateX(50px);opacity:0;}
+}
+
+/* BIRDS */
+.bird{
+  position:fixed;
+  font-size:20px;
+  top:20%;
+  left:-50px;
+  animation:fly 8s linear forwards;
+}
+@keyframes fly{
+  to{transform:translateX(120vw);}
 }
 
 /* HEART */
@@ -98,16 +137,10 @@ section{
   color:var(--accent);
   animation:float 3s linear forwards;
 }
-
 @keyframes float{
   0%{opacity:0;}
   30%{opacity:1;}
   100%{transform:translateY(-150px);opacity:0;}
-}
-
-@keyframes reveal{
-  from{opacity:0;filter:blur(10px);transform:scale(0.9);}
-  to{opacity:1;filter:blur(0);transform:scale(1);}
 }
 </style>
 </head>
@@ -116,24 +149,21 @@ section{
 
 <div class="progress" id="progress"></div>
 
-<!-- MUSIC -->
 <div class="music" id="musicBtn">🔊</div>
 <audio id="bgMusic" loop>
-  <source src="music.mp3" type="audio/mp3">
+  <source src="music.mp3">
 </audio>
 
-<!-- HERO -->
 <section class="hero">
   <h1>Our Story ❤️</h1>
   <p>Swipe or scroll</p>
 </section>
 
-<!-- SLIDES -->
 <section class="slide">
   <img src="photo1.jpg">
   <div class="caption">
     <h2>The first moment</h2>
-    <p id="type1"></p>
+    <p id="t1"></p>
   </div>
 </section>
 
@@ -141,7 +171,7 @@ section{
   <img src="photo2.jpg">
   <div class="caption">
     <h2>Your smile</h2>
-    <p id="type2"></p>
+    <p id="t2"></p>
   </div>
 </section>
 
@@ -149,45 +179,61 @@ section{
   <img src="photo3.jpg">
   <div class="caption">
     <h2>Every moment</h2>
-    <p id="type3"></p>
+    <p id="t3"></p>
   </div>
 </section>
 
-<!-- FINAL -->
 <section class="final">
   <h1>I Love You ❤️</h1>
-  <p>Forever & Always</p>
+  <div class="love">Forever 💖</div>
 </section>
 
 <script>
-const sections = document.querySelectorAll('section');
-const progress = document.getElementById('progress');
-let index = 0;
+const sections=document.querySelectorAll('section');
+const progress=document.getElementById('progress');
+let index=0;
 
 function show(i){
   sections.forEach((s,idx)=>{
-    s.style.transform = `translateY(${(idx-i)*100}%)`;
+    s.style.transform=`translateY(${(idx-i)*100}%)`;
+    s.classList.remove("from-left","from-right","from-bottom");
+
+    if(idx===i){
+      if(idx%3===0)s.classList.add("from-left");
+      else if(idx%3===1)s.classList.add("from-right");
+      else s.classList.add("from-bottom");
+    }
   });
 
-  progress.style.width = ((i)/(sections.length-1))*100 + "%";
+  progress.style.width=(i/(sections.length-1))*100+"%";
 
   runTyping(i);
+
+  if(i===sections.length-1){
+    petals();
+    birds();
+  }
 }
 
-/* SCROLL */
-window.addEventListener('wheel', e=>{
+/* SCROLL CONTROL */
+let lock=false;
+window.addEventListener('wheel',e=>{
+  if(lock)return;
+  lock=true;
+
   if(e.deltaY>0 && index<sections.length-1) index++;
   else if(e.deltaY<0 && index>0) index--;
+
   show(index);
+  setTimeout(()=>lock=false,800);
 });
 
 /* SWIPE */
 let startY=0;
-window.addEventListener('touchstart', e=>{
+window.addEventListener('touchstart',e=>{
   startY=e.touches[0].clientY;
 });
-
-window.addEventListener('touchend', e=>{
+window.addEventListener('touchend',e=>{
   let endY=e.changedTouches[0].clientY;
 
   if(startY-endY>50 && index<sections.length-1) index++;
@@ -196,17 +242,29 @@ window.addEventListener('touchend', e=>{
   show(index);
 });
 
-/* AUTO */
-setInterval(()=>{
-  if(index<sections.length-1){
-    index++;
-    show(index);
-  }
-},5000);
+/* TYPING FIX */
+let typingTimer;
+
+function type(el,text){
+  clearInterval(typingTimer);
+  el.innerHTML="";
+  let i=0;
+  typingTimer=setInterval(()=>{
+    el.innerHTML+=text[i];
+    i++;
+    if(i>=text.length) clearInterval(typingTimer);
+  },60);
+}
+
+function runTyping(i){
+  if(i===1) type(t1,"Everything changed when I saw you...");
+  if(i===2) type(t2,"Your smile makes my world brighter...");
+  if(i===3) type(t3,"Every moment with you feels like home...");
+}
 
 /* HEART */
-document.addEventListener('click', e=>{
-  const h=document.createElement('div');
+document.addEventListener('click',e=>{
+  let h=document.createElement('div');
   h.className='heart';
   h.innerHTML='❤️';
   h.style.left=e.clientX+'px';
@@ -220,41 +278,36 @@ const music=document.getElementById('bgMusic');
 const btn=document.getElementById('musicBtn');
 
 btn.onclick=()=>{
-  if(music.paused){
-    music.play();
-    btn.innerHTML="🔊";
-  }else{
-    music.pause();
-    btn.innerHTML="🔇";
-  }
+  if(music.paused){music.play();btn.innerHTML="🔊";}
+  else{music.pause();btn.innerHTML="🔇";}
 };
 
-/* TYPING EFFECT */
-const texts=[
-  "",
-  "Everything changed when I saw you...",
-  "Your smile makes my world brighter...",
-  "Every moment with you feels like home..."
-];
-
-function typeText(el, text){
-  el.innerHTML="";
-  let i=0;
-  let interval=setInterval(()=>{
-    el.innerHTML+=text[i];
-    i++;
-    if(i>=text.length) clearInterval(interval);
-  },40);
+/* PETALS */
+function petals(){
+  setInterval(()=>{
+    let p=document.createElement('div');
+    p.className='petal';
+    p.style.left=Math.random()*100+'vw';
+    p.style.animationDuration=(Math.random()*3+3)+'s';
+    document.body.appendChild(p);
+    setTimeout(()=>p.remove(),5000);
+  },300);
 }
 
-function runTyping(i){
-  if(i===1) typeText(document.getElementById("type1"),texts[1]);
-  if(i===2) typeText(document.getElementById("type2"),texts[2]);
-  if(i===3) typeText(document.getElementById("type3"),texts[3]);
+/* BIRDS */
+function birds(){
+  for(let i=0;i<3;i++){
+    let b=document.createElement('div');
+    b.className='bird';
+    b.innerHTML='🕊️';
+    b.style.top=(20+i*10)+'%';
+    document.body.appendChild(b);
+    setTimeout(()=>b.remove(),8000);
+  }
 }
 
 show(index);
 </script>
 
 </body>
-</html>
+</html>z
