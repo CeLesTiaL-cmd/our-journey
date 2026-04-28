@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>For My Love ❤️</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+
+<style>
+:root{
+  --bg:#ffffff;
+  --text:#222;
+  --accent:#ff4d6d;
+}
+
+*{margin:0;padding:0;box-sizing:border-box;}
+
+body{
+  font-family:'Poppins',sans-serif;
+  background:var(--bg);
+  color:var(--text);
+  overflow:hidden;
+}
+
+/* PROGRESS BAR */
+.progress{
+  position:fixed;
+  top:0;
+  left:0;
+  height:4px;
+  background:var(--accent);
+  width:0%;
+  z-index:999;
+  transition:width 0.4s ease;
+}
+
+/* SECTION */
+section{
+  height:100vh;
+  width:100%;
+  position:absolute;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  flex-direction:column;
+  transition:transform 0.8s ease;
+}
+
+/* HERO */
+.hero h1{
+  font-size:2.5rem;
+  color:var(--accent);
+}
+.hero p{opacity:0.6;margin-top:10px;}
+
+/* SLIDES */
+.slide{
+  text-align:center;
+}
+
+.slide img{
+  width:90%;
+  max-width:380px;
+  border-radius:20px;
+  box-shadow:0 10px 40px rgba(0,0,0,0.15);
+  animation:reveal 1.2s ease;
+}
+
+.caption h2{
+  color:var(--accent);
+  margin-top:15px;
+}
+.caption p{opacity:0.7;}
+
+/* FINAL */
+.final h1{
+  color:var(--accent);
+  font-size:2.5rem;
+}
+
+/* MUSIC BUTTON */
+.music{
+  position:fixed;
+  bottom:20px;
+  right:20px;
+  background:var(--accent);
+  color:white;
+  padding:10px 15px;
+  border-radius:20px;
+  cursor:pointer;
+  z-index:999;
+}
+
+/* HEART */
+.heart{
+  position:fixed;
+  color:var(--accent);
+  animation:float 3s linear forwards;
+}
+
+@keyframes float{
+  0%{opacity:0;}
+  30%{opacity:1;}
+  100%{transform:translateY(-150px);opacity:0;}
+}
+
+@keyframes reveal{
+  from{opacity:0;filter:blur(10px);transform:scale(0.9);}
+  to{opacity:1;filter:blur(0);transform:scale(1);}
+}
+</style>
+</head>
+
+<body>
+
+<div class="progress" id="progress"></div>
+
+<!-- MUSIC -->
+<div class="music" id="musicBtn">🔊</div>
+<audio id="bgMusic" loop>
+  <source src="music.mp3" type="audio/mp3">
+</audio>
+
+<!-- HERO -->
+<section class="hero">
+  <h1>Our Story ❤️</h1>
+  <p>Swipe or scroll</p>
+</section>
+
+<!-- SLIDES -->
+<section class="slide">
+  <img src="photo1.jpg">
+  <div class="caption">
+    <h2>The first moment</h2>
+    <p id="type1"></p>
+  </div>
+</section>
+
+<section class="slide">
+  <img src="photo2.jpg">
+  <div class="caption">
+    <h2>Your smile</h2>
+    <p id="type2"></p>
+  </div>
+</section>
+
+<section class="slide">
+  <img src="photo3.jpg">
+  <div class="caption">
+    <h2>Every moment</h2>
+    <p id="type3"></p>
+  </div>
+</section>
+
+<!-- FINAL -->
+<section class="final">
+  <h1>I Love You ❤️</h1>
+  <p>Forever & Always</p>
+</section>
+
+<script>
+const sections = document.querySelectorAll('section');
+const progress = document.getElementById('progress');
+let index = 0;
+
+function show(i){
+  sections.forEach((s,idx)=>{
+    s.style.transform = `translateY(${(idx-i)*100}%)`;
+  });
+
+  progress.style.width = ((i)/(sections.length-1))*100 + "%";
+
+  runTyping(i);
+}
+
+/* SCROLL */
+window.addEventListener('wheel', e=>{
+  if(e.deltaY>0 && index<sections.length-1) index++;
+  else if(e.deltaY<0 && index>0) index--;
+  show(index);
+});
+
+/* SWIPE */
+let startY=0;
+window.addEventListener('touchstart', e=>{
+  startY=e.touches[0].clientY;
+});
+
+window.addEventListener('touchend', e=>{
+  let endY=e.changedTouches[0].clientY;
+
+  if(startY-endY>50 && index<sections.length-1) index++;
+  else if(endY-startY>50 && index>0) index--;
+
+  show(index);
+});
+
+/* AUTO */
+setInterval(()=>{
+  if(index<sections.length-1){
+    index++;
+    show(index);
+  }
+},5000);
+
+/* HEART */
+document.addEventListener('click', e=>{
+  const h=document.createElement('div');
+  h.className='heart';
+  h.innerHTML='❤️';
+  h.style.left=e.clientX+'px';
+  h.style.top=e.clientY+'px';
+  document.body.appendChild(h);
+  setTimeout(()=>h.remove(),3000);
+});
+
+/* MUSIC */
+const music=document.getElementById('bgMusic');
+const btn=document.getElementById('musicBtn');
+
+btn.onclick=()=>{
+  if(music.paused){
+    music.play();
+    btn.innerHTML="🔊";
+  }else{
+    music.pause();
+    btn.innerHTML="🔇";
+  }
+};
+
+/* TYPING EFFECT */
+const texts=[
+  "",
+  "Everything changed when I saw you...",
+  "Your smile makes my world brighter...",
+  "Every moment with you feels like home..."
+];
+
+function typeText(el, text){
+  el.innerHTML="";
+  let i=0;
+  let interval=setInterval(()=>{
+    el.innerHTML+=text[i];
+    i++;
+    if(i>=text.length) clearInterval(interval);
+  },40);
+}
+
+function runTyping(i){
+  if(i===1) typeText(document.getElementById("type1"),texts[1]);
+  if(i===2) typeText(document.getElementById("type2"),texts[2]);
+  if(i===3) typeText(document.getElementById("type3"),texts[3]);
+}
+
+show(index);
+</script>
+
+</body>
+</html>
